@@ -72,7 +72,7 @@ class MyEnv(gym.Env):
         self.erdrickMana = MyEnv.erdrickMaxMana # あるすMP
         self.kaclang = 0 # アストロン残りターン
         self.zomaHealth = MyEnv.zomaMaxHealth # ゾーマHP
-        self.darkRobe = 1 # やみのころもフラグ
+        self.darkRobe = True # やみのころもフラグ
         self.steps = 0 # ターン
         return self.observe(), {}
 
@@ -141,13 +141,9 @@ class MyEnv(gym.Env):
             else:
               manaLack = True
           elif action == 4:
-            defendFlag = 1
-            if debugLog:
-              print ("あるすは みをまもっている。")
-          elif action == 5:
+            self.darkRobe = False
             if debugLog:
               print ("あるすは ひかりのたまを つかった！")
-              self.darkRobe = 0
 
           if self.erdrickMaxHealth < self.erdrickHealth:
             self.erdrickHealth = self.erdrickMaxHealth
@@ -213,7 +209,7 @@ class MyEnv(gym.Env):
         # self.damage += self._get_damage(self.pos)
         self.done = self._is_done()
         self.truncated = self._is_truncated()
-        return observation, reward, self.done, self.truncated, {self.darkRobe}
+        return observation, reward, self.done, self.truncated, {"orb": not self.darkRobe}
 
     def render(self, mode='human', close=False):
         # human の場合はコンソールに出力。ansiの場合は StringIO を返す

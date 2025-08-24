@@ -60,7 +60,7 @@ class DQNAgent:
         self.epsilon = 0.1
         self.buffer_size = 10000
         self.batch_size = 128
-        self.action_size = 4
+        self.action_size = 5
 
         self.replay_buffer = ReplayBuffer(self.buffer_size, self.batch_size)
         self.qnet = QNet(self.action_size)
@@ -124,6 +124,7 @@ episode = 0
 episodeTotal = 0
 
 wins = 0
+orbs = 0
 allDone = False
 
 while not allDone:
@@ -131,6 +132,7 @@ while not allDone:
     env.setLog(episode == 99)
     done = False
     total_reward = 0
+    orbF = False
     winFlag = False
 
     if episode >= 80:
@@ -152,19 +154,23 @@ while not allDone:
             if episode >= 80:
                 wins += 1
             winFlag = True
+        if info["orb"] and not orbF:
+            orbs += 1
+            orbF = True
 
     if episode % sync_interval == 0:
         agent.sync_qnet()
 
     reward_history.append(total_reward)
-    print("エピソード", episodeTotal, "の合計報酬:", total_reward, ("Win" if winFlag else "Lose"))
+    # print("エピソード", episodeTotal, "の合計報酬:", total_reward, ("Win" if winFlag else "Lose"))
 
     episode += 1
     episodeTotal += 1
     if episode == 100:
-        print("20戦中 勝利数:", wins)
+        print("20戦中 勝利数:", wins, "100戦中 ひかりのたま使用数:", orbs)
         if wins > 15:
             print("総エピソード数:", episodeTotal)
             allDone = True
         wins = 0
+        orbs = 0
         episode = 0
